@@ -68,10 +68,25 @@ form input[type=text] {
     margin-top: 5px;
     margin-bottom: 5px;
 }
-
+#submission-form {
+    display: block;
+    margin-top: 10px;
+    margin-left: 125px;
+    margin-bottom: 10px;
+}
+#username-text #roomname-text {
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
 .button {
+    display: block;
     background: #DDFFFF;
     color: #700000;
+}
+.button-submit {
+    margin-left: 150px;
 }
 .username{
     display: block;
