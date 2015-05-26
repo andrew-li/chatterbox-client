@@ -60,7 +60,7 @@ App.prototype.addRoom = function(roomName) {
 
     for(var i = 0; this.roomList.hasOwnProperty(roomName) && i < this.roomList[roomName].length; i++)
     {
-      room += '<span>'
+      room += '<span class="username message">'
        + this.roomList[roomName][i].username
        + ': '
        + this.roomList[roomName][i].text
@@ -180,9 +180,9 @@ var app = new App();
 
 app.init();
 
-app.send({username: "ME!",
-          text: "Sorry it was me!!!",
-          roomname: "Stinky Bathroom"
+app.send({username: "SF BOUND",
+          text: "|[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []|",
+          roomname: "BART"
 });
 
 console.log(app);
