@@ -1,0 +1,53 @@
+room1
+  username1: "message"
+  username1: "message"
+  username2: "fsdfsdf"
+
+
+room2
+  username1: "message"
+  username2: "fsdfsdf"
+
+
+each room is a div
+write username with colons and message
+pad each username message
+
+
+
+<div>
+roomname
+<s></s>
+<s></s>
+</div>
+
+results
+
+var roomList = {room1: [{username: "bob", message: "hi"}, {}, {}],
+                room2: []
+              }
+
+
+the first time you see a name, put into a map
+roomList[roomname] = [{username:, message:} , {}]
+and also put its message into that roomList[roomname]
+
+when we see a repeat, then push the username and message
+
+
+
+
+bugs:
+addroom
+roomname????
+add message passing even tho not implemented
+if id=main
+app.addRoom("roomsssx");
+addroom???
+
+
+
+clear messages (add a button?)
+send interface
+friend
+css (Timmy)

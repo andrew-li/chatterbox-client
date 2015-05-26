@@ -1,6 +1,7 @@
 // YOUR CODE HERE:
 
 var App = function() {
+  this.server = 'https://api.parse.com/1/classes/chatterbox';
   this.roomList = {};
 };
 
@@ -16,12 +17,12 @@ App.prototype.replaceEscapeCharacters = function(str) {
   return tempStr.replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/\"/g, '&quot;')
-    .replace(/\'/g, '&#39;');
+    .replace(/\"/g, '')
+    .replace(/\'/g, '');
 };
 
-App.prototype.makeRooms = function() {
 
+App.prototype.addRooms = function() {
   // var roomname;
   // if(roomData.roomname === undefined)
   //   roomname = "undefined";
@@ -37,16 +38,43 @@ App.prototype.makeRooms = function() {
 
   // return room;
 
-  var room;
   for(var roomName in this.roomList)
   {
-    room = '<div>'
-    + roomName
-    + '</div>';
+    this.addRoom(roomName);
+  }
+};
+
+App.prototype.addRoom = function(roomName) {
+
+    var tempRoomName;
+    if(roomName === '')
+      tempRoomName = "EmptyRoom";
+    else
+      tempRoomName = roomName;
+
+    var room = '<div '
+    + 'id="'
+    + tempRoomName
+    + '" class="room">'
+    + tempRoomName;
+
+    for(var i = 0; this.roomList.hasOwnProperty(roomName) && i < this.roomList[roomName].length; i++)
+    {
+      room += '<span>'
+       + this.roomList[roomName][i].username
+       + ': '
+       + this.roomList[roomName][i].text
+       + '</span>';
+    }
+
+    room += '</div>';
 
     $('#main').append(room);
-  }
+};
 
+App.prototype.addMessage = function(message) {
+  //find roomname in dom
+  //target that roomname and append the message
 };
 
 App.prototype.handleData = function(data) {
@@ -81,22 +109,26 @@ App.prototype.handleData = function(data) {
     if (data.results[i].hasOwnProperty(stringifiedRoomName) === false) {
       this.roomList[stringifiedRoomName] = [];
     }
+
+    console.log(stringifiedRoomName);
+    console.log(this.roomList[stringifiedRoomName]);
     this.roomList[stringifiedRoomName].push({"username" : stringifiedUserName,
-                                        "text" : stringifiedText});
+                                        "text" : stringifiedText,
+                                        "roomname" : stringifiedRoomName});
   };
 
   console.log(this.roomList);
 
-  this.makeRooms();
+  this.addRooms();
 
 };
 
-App.prototype.getMessages = function() {
+App.prototype.fetch = function() {
 
   var oldThis = this;
   $.ajax({
     // always use this url
-    url: 'https://api.parse.com/1/classes/chatterbox',
+    url: this.server,
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
@@ -113,13 +145,45 @@ App.prototype.getMessages = function() {
 
 };
 
+App.prototype.send = function(message) {
+  $.ajax({
+    // always use this url
+    url: this.server,
+    type: 'POST',
+    data: JSON.stringify(message),
+    contentType: 'application/json',
+    success: function (data) {
+      console.log('chatterbox: Message sent');
+    },
+    error: function (data) {
+      // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+      console.error('chatterbox: Failed to send message');
+    }
+  });
+};
+
+App.prototype.clearMessages = function() {
+  $('.room').remove();
+};
+
+App.prototype.refresh = function() {
+  this.clearMessages();
+  this.fetch();
+};
+
 App.prototype.init = function() {
-  this.getMessages();
+  this.fetch();
+  //setInterval(this.refresh.bind(this), 5000);
 };
 
 var app = new App();
 
 app.init();
+
+app.send({username: "ME!",
+          text: "Sorry it was me!!!",
+          roomname: "Stinky Bathroom"
+});
 
 console.log(app);
 
