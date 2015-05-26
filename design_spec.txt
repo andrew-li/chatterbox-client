@@ -38,16 +38,11 @@ when we see a repeat, then push the username and message
 
 
 bugs:
-addroom
-roomname????
 add message passing even tho not implemented
-if id=main
-app.addRoom("roomsssx");
-addroom???
+addroom spec???
 
+to do:
+spine
+backbone
+extra credit?
 
-
-clear messages (add a button?)
-send interface
-friend
-css (Timmy)

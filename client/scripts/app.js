@@ -3,6 +3,7 @@
 var App = function() {
   this.server = 'https://api.parse.com/1/classes/chatterbox';
   this.roomList = {};
+  this.friendList = [];
 };
 
 App.prototype.replaceEscapeCharacters = function(str) {
@@ -49,6 +50,8 @@ App.prototype.addRoom = function(roomName) {
     var tempRoomName;
     if(roomName === '')
       tempRoomName = "EmptyRoom";
+    else if (roomName === "main")
+      tempRoomName = "main_0";
     else
       tempRoomName = roomName;
 
@@ -60,7 +63,13 @@ App.prototype.addRoom = function(roomName) {
 
     for(var i = 0; this.roomList.hasOwnProperty(roomName) && i < this.roomList[roomName].length; i++)
     {
-      room += '<span class="username message">'
+      room += '<span class="username message"';
+
+      if (this.friendList.indexOf(this.roomList[roomName][i].username) > -1) {
+        room += ' style="font-weight:bold;"';
+      }
+
+      room += '>'
        + this.roomList[roomName][i].username
        + ': '
        + this.roomList[roomName][i].text
@@ -78,7 +87,6 @@ App.prototype.addMessage = function(message) {
 };
 
 App.prototype.handleData = function(data) {
-  console.log(data);
 
   //var results = data.results;
 
@@ -100,24 +108,21 @@ App.prototype.handleData = function(data) {
   //   $('#main').append(makeRoom(sortedResults[i]));
   // }
 
+  this.roomList = {};
 
   for (var i = 0; i < data.results.length; i++) {
     var stringifiedRoomName = this.replaceEscapeCharacters(data.results[i].roomname);
     var stringifiedUserName = this.replaceEscapeCharacters(data.results[i].username);
     var stringifiedText = this.replaceEscapeCharacters(data.results[i].text);
 
-    if (data.results[i].hasOwnProperty(stringifiedRoomName) === false) {
+    if (this.roomList.hasOwnProperty(stringifiedRoomName) === false) {
       this.roomList[stringifiedRoomName] = [];
     }
 
-    console.log(stringifiedRoomName);
-    console.log(this.roomList[stringifiedRoomName]);
     this.roomList[stringifiedRoomName].push({"username" : stringifiedUserName,
                                         "text" : stringifiedText,
                                         "roomname" : stringifiedRoomName});
   };
-
-  console.log(this.roomList);
 
   this.addRooms();
 
@@ -135,7 +140,6 @@ App.prototype.fetch = function() {
       console.log('chatterbox: Message received');
 
       oldThis.handleData(data);
-
     },
     error: function () {
       // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -169,6 +173,7 @@ App.prototype.clearMessages = function() {
 App.prototype.refresh = function() {
   this.clearMessages();
   this.fetch();
+
 };
 
 App.prototype.init = function() {
@@ -180,14 +185,63 @@ var app = new App();
 
 app.init();
 
-app.send({username: "SF BOUND",
-          text: "|[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []||[]   []   []|",
-          roomname: "BART"
+$(document).ready(function() {
+  $('.button-refresh').click(function(){
+    app.refresh();
+  });
+
+  $('.button-submit').click(function(){
+    var message = $('#submission-form').val();
+    var username = $('#username-text').val();
+    var roomname = $('#roomname-text').val();
+
+    var sendObj = {};
+
+    if(message !== undefined && message !== null && message !== '')
+      sendObj["text"] = message;
+
+    if(username !== undefined && username !== null && username !== '')
+      sendObj["username"] = username;
+
+    if(roomname !== undefined && roomname !== null && roomname !== '')
+      sendObj["roomname"] = roomname;
+
+    if (Object.keys(sendObj).length > 0)
+      app.send(sendObj);
+
+    $('#submission-form').val('');
+    $('#username-text').val('');
+    $('#roomname-text').val('');
+    app.refresh();
+  });
+
+  $('.button-showroom').click(function(){
+    var roomname = $('#showroom-form').val();
+
+    app.clearMessages();
+    $('#showroom-form').val('');
+    app.addRoom(roomname);
+  });
+
+  $('.button-addfriend').click(function() {
+    var friendname = $('#friend-form').val();
+
+    app.friendList.push(friendname);
+    $('#friend-form').val('');
+    app.refresh();
+  });
+
+  $('.button-removefriend').click(function() {
+    var friendname = $('#friend-form').val();
+
+    var friendIndex = app.friendList.indexOf(friendname);
+
+    if(friendIndex >= 0)
+      app.friendList.splice(friendIndex, 1);
+
+    $('friend-form').val('');
+    app.refresh();
+  });
 });
-
-console.log(app);
-
-
-
 
 
